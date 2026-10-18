@@ -14,11 +14,18 @@ spring:
 
 
   ai:
-    ollama:
-      base-url: http://localhost:11434
+    model:
+      chat: openai
+
+    openai:
+      base-url: https://openrouter.ai/api
+      api-key: ${OPENROUTER_API_KEY}
       chat:
         options:
-          model: llama3.2:1b
+          model: openrouter/free
+
+    ollama:
+      base-url: http://localhost:11434
       embedding:
         model: nomic-embed-text
 
