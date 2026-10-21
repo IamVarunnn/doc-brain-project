@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public class DocumentParserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentParserService.class)
+    private static final Logger logger = LoggerFactory.getLogger(DocumentParserService.class);
 
     public List<Document> parse(MultipartFile file) {
 

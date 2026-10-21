@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,6 +39,7 @@ public class DocumentMetadataService {
                 .contentType(contentType)
                 .status(DocumentStatus.UPLOADING)
                 .fileSize(file.getSize())
+                .createdAt(LocalDateTime.now())
                 .build();
 
 
