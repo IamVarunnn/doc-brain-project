@@ -16,21 +16,27 @@ spring:
   ai:
     model:
       chat: openai
+      embedding: openai
 
     openai:
       base-url: https://openrouter.ai/api
       api-key: ${OPENROUTER_API_KEY}
+
       chat:
         options:
           model: openrouter/free
 
-
+      embedding:
+        base-url: https://openrouter.ai/api
+        api-key: ${OPENROUTER_API_KEY}
+        model: openai/text-embedding-3-small
+        dimensions: 1536
 
     vectorstore:
       pgvector:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
-        dimensions: 768
+        dimensions: 1536
         table-name: vector_store
         schema-name: public
         initialize-schema: true
