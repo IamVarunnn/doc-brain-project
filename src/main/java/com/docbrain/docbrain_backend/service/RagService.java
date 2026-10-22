@@ -30,7 +30,7 @@ public class RagService {
     private final ChatClient chatClient;
 
 
-    private ChatResponseDto askQuestion(ChatRequestDto request){
+    public ChatResponseDto askQuestion(ChatRequestDto request){
 
         long startTime = System.currentTimeMillis();
         logger.info("Processing query: '{}', scoped documentsId: {}", request.getQuestion(), request.getDocumentId());
