@@ -73,13 +73,15 @@
 			<version>0.13.0</version>
 		</dependency>
 
+		<!-- JJWT implementation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
+			<artifactId>jjwt-impl</artifactId>
 			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- JSON serialization support -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>

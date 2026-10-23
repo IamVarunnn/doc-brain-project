@@ -47,6 +47,10 @@ spring:
       max-request-size: 50MB
 
 
+jwt:
+  secret: ${JWT_SECRET:haikyuu}
+  expiration : 3600000
+
 app:
   rag:
     chunk-size: 700
