@@ -56,7 +56,7 @@ public class DocumentIngestionService {
                 return 0;
             }
 
-            // 2. Meta data environment on each chunk
+            // 2. Metadata environment on each chunk
             List<Document> enrichedChunks = new ArrayList<>();
             for(int i = 0; i < chunks.size(); i++){
                 Document chunk = chunks.get(i);
@@ -65,6 +65,7 @@ public class DocumentIngestionService {
                 enrichedMetadata.put("fileName", metadata.getFilename());
                 enrichedMetadata.put("contentType", metadata.getContentType());
                 enrichedMetadata.put("chunkIndex", i);
+                enrichedMetadata.put("userId", metadata.getUser().getId());
                 Object pageNumber = chunk.getMetadata().get("page_number");
                 if(pageNumber == null){
                     pageNumber = chunk.getMetadata().get("pageNumber");

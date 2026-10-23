@@ -4,6 +4,7 @@ import com.docbrain.docbrain_backend.dto.DocumentMetadataDto;
 import com.docbrain.docbrain_backend.dto.DocumentResponseDto;
 import com.docbrain.docbrain_backend.entity.DocumentMetadata;
 import com.docbrain.docbrain_backend.entity.DocumentStatus;
+import com.docbrain.docbrain_backend.entity.User;
 import com.docbrain.docbrain_backend.exception.DocumentProcessingException;
 import com.docbrain.docbrain_backend.exception.ResourceNotFoundException;
 import com.docbrain.docbrain_backend.respositry.DocumentMetadataRepo;
@@ -35,12 +36,13 @@ public class DocumentMetadataService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    public DocumentResponseDto uploadAndProcess(MultipartFile file) {
+    public DocumentResponseDto uploadAndProcess(MultipartFile file, User user) {
 
         String fileName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
         String contentType = file.getContentType() != null ? file.getContentType() : "application/octat-stream";
 
-        // document meta data create
+        // document metadata create
+        // storing user details with metadata
         DocumentMetadata documentMetadata = DocumentMetadata
                 .builder()
                 .filename(fileName)
@@ -48,6 +50,7 @@ public class DocumentMetadataService {
                 .status(DocumentStatus.UPLOADING)
                 .fileSize(file.getSize())
                 .createdAt(LocalDateTime.now())
+                .user(user)
                 .build();
 
         List<Document> parsedDocs = null;
@@ -77,16 +80,17 @@ public class DocumentMetadataService {
                 .fileSize(documentMetadata.getFileSize())
                 .chunksCreated(chunksCreated)
                 .status(documentMetadata.getStatus())
-                .message("Document successfully processed and indexed")
+                .message("Document successfully processed and indexed.")
+                .userId(user.getId())
                 .build();
     }
 
-    public List<DocumentResponseDto> uploadMultipleDocuments(List<MultipartFile> files) {
+    public List<DocumentResponseDto> uploadMultipleDocuments(List<MultipartFile> files, User user) {
 
         List<DocumentResponseDto> responseDtos = new ArrayList<>();
 
         for(MultipartFile file : files){
-           DocumentResponseDto result = this.uploadAndProcess(file);
+           DocumentResponseDto result = this.uploadAndProcess(file, user);
            responseDtos.add(result);
         }
         return responseDtos;
@@ -101,6 +105,14 @@ public class DocumentMetadataService {
                 .toList();
     }
 
+
+    public  List<DocumentMetadataDto> getAllDocumentsByUser(User user){
+        List<DocumentMetadata> documents = documentMetadataRepo.findByUserOrderByCreatedAtDesc(user);
+
+        return documents.stream()
+                .map(documentMetadata -> modelMapper.map(documentMetadata, DocumentMetadataDto.class))
+                .toList();
+    }
 
     public DocumentMetadataDto getDocumentById(UUID id) {
         DocumentMetadata documentMetadata = documentMetadataRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Document with given id not found"));

@@ -18,4 +18,5 @@ public class DocumentResponseDto {
     private DocumentStatus status;
     private Integer chunksCreated;
     private String message;
+    private Long userId;
 }
