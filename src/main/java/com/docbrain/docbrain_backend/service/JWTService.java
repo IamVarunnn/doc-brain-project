@@ -4,6 +4,7 @@ package com.docbrain.docbrain_backend.service;
 import com.docbrain.docbrain_backend.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
+
 public class JWTService {
     @Value("${jwt.secret}")
     private String secret;

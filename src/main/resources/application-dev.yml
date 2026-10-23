@@ -48,8 +48,8 @@ spring:
 
 
 jwt:
-  secret: ${JWT_SECRET:haikyuu}
-  expiration : 3600000
+  secret: ${JWT_SECRET:DocBrain-Local-Dev-Secret-Key-2026-AtLeast32Bytes!}
+  expiration : 86400000
 
 app:
   rag:
@@ -59,6 +59,6 @@ app:
     similarity-threshold: 0.0
 
   cors:
-    allowed-origins: "*"
+    allowed-origins: "http://localhost:3000"
     allowed-methods: GET,POST,PUT,DELETE,OPTIONS
     allowed-headers: "*"
