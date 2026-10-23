@@ -7,6 +7,7 @@ import com.docbrain.docbrain_backend.entity.DocumentStatus;
 import com.docbrain.docbrain_backend.exception.DocumentProcessingException;
 import com.docbrain.docbrain_backend.exception.ResourceNotFoundException;
 import com.docbrain.docbrain_backend.respositry.DocumentMetadataRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class DocumentMetadataService {
     private final JdbcTemplate jdbcTemplate;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public DocumentResponseDto uploadAndProcess(MultipartFile file) {
 
         String fileName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
@@ -106,9 +108,10 @@ public class DocumentMetadataService {
 
     }
 
+    @Transactional
     public void deleteDocument(UUID id) {
         DocumentMetadata documentMetadata = documentMetadataRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Document with given id not found"));
-
+        documentMetadataRepo.delete(documentMetadata);
         // delete the vector entries
         try {
             String deleteVectorSql = "DELETE FROM vector_store WHERE metadata->>'documentId' = ?";

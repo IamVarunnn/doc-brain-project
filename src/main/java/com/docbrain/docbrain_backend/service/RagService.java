@@ -10,6 +10,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -207,7 +208,8 @@ public class RagService {
 
         if(documentId != null){
             FilterExpressionBuilder b = new FilterExpressionBuilder();
-            searchRequestBuilder.filterExpression(b.eq("documentId", documentId.toString()).build());
+            Filter.Expression documentId1 = b.eq("documentId", documentId.toString()).build();
+            searchRequestBuilder.filterExpression(documentId1);
         }
 
         try{
