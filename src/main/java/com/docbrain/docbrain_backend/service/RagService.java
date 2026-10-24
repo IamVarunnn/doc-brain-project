@@ -2,6 +2,7 @@ package com.docbrain.docbrain_backend.service;
 
 import com.docbrain.docbrain_backend.config.AppProperties;
 import com.docbrain.docbrain_backend.dto.*;
+import com.docbrain.docbrain_backend.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class RagService {
     private final ChatClient chatClient;
 
 
-    public ChatResponseDto askQuestion(ChatRequestDto request){
+    public ChatResponseDto askQuestion(ChatRequestDto request, User user){
 
         long startTime = System.currentTimeMillis();
         logger.info("Processing query: '{}', scoped documentsId: {}", request.getQuestion(), request.getDocumentId());
@@ -39,7 +40,8 @@ public class RagService {
                 request.getQuestion(),
                 request.getDocumentId(),
                 request.getTopK(),
-                request.getMinSimilarity()
+                request.getMinSimilarity(),
+                user
         );
 
 
@@ -67,14 +69,15 @@ public class RagService {
                 .build();
     }
 
-    public Flux<String> streamQuestionAnswer(ChatRequestDto requestDto){
+    public Flux<String> streamQuestionAnswer(ChatRequestDto requestDto, User user){
         logger.info("Streaming query: '{}'", requestDto.getQuestion());
 
         List<Document> relevantDocuments = retrieverRelevantDocuments(
                 requestDto.getQuestion(),
                 requestDto.getDocumentId(),
                 requestDto.getTopK(),
-                requestDto.getMinSimilarity()
+                requestDto.getMinSimilarity(),
+                user
         );
         String contextText = buildContextString(relevantDocuments);
         String userPrompt = buildPrompt(requestDto.getQuestion(), contextText);
@@ -128,13 +131,14 @@ public class RagService {
     }
 
 
-    public SearchResultDto searchSimilarChunks(SearchRequestDto request){
+    public SearchResultDto searchSimilarChunks(SearchRequestDto request, User user){
 
         List<Document> matchedDocs =  retrieverRelevantDocuments(
                 request.getQuery(),
                 request.getDocumentId(),
                 request.getTopK(),
-                request.getSimilaritySearch()
+                request.getSimilaritySearch(),
+                user
         );
 
         List<CitationDto> citations = matchedDocs.stream()
@@ -192,7 +196,7 @@ public class RagService {
                 .build();
     }
 
-    private List<Document> retrieverRelevantDocuments(@NotBlank(message = "Query cannot be empty") String query, UUID documentId, Integer topK, Double similaritySearch) {
+    private List<Document> retrieverRelevantDocuments(@NotBlank(message = "Query cannot be empty") String query, UUID documentId, Integer topK, Double similaritySearch, User user) {
 
         int effectiveTopK = (topK != null && topK > 0) ? topK : appProperties.getRag().getTopK();
         double effectiveSimilarity = (similaritySearch != null) ? similaritySearch : appProperties.getRag().getSimilarityThreshold();
@@ -206,11 +210,21 @@ public class RagService {
             searchRequestBuilder.similarityThreshold(effectiveSimilarity);
         }
 
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+        Filter.Expression filterExpression;
         if(documentId != null){
-            FilterExpressionBuilder b = new FilterExpressionBuilder();
-            Filter.Expression documentId1 = b.eq("documentId", documentId.toString()).build();
-            searchRequestBuilder.filterExpression(documentId1);
+
+            filterExpression =
+            b.and(
+                    b.eq("userId", user.getId().toString()),
+                    b.eq("documentId", documentId.toString())
+            ).build();
+
         }
+        else{
+            filterExpression = b.eq("userId", user.getId().toString()).build();
+        }
+        searchRequestBuilder.filterExpression(filterExpression);
 
         try{
 
